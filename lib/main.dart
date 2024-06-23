@@ -1,12 +1,20 @@
 import 'dart:convert';
 
+import 'package:api/Api/IdP.dart';
+import 'package:api/post/PostPractice.dart';
+import 'package:api/post/postapi.dart';
+import 'package:api/weather.dart';
 import 'package:flutter/material.dart';
-
+import 'Api/Facts.dart';
 import 'Api/apiModel.dart';
 import 'package:http/http.dart' as http;
-
 import 'Api/apiModel2.dart';
 import 'Api/apiModel3.dart';
+import 'Api/apiModel4.dart';
+import 'Api/apiModel5.dart';
+import 'Api/apiModel6.dart';
+import 'Api/apiModelList.dart';
+import 'limit/RangeSetApi.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,6 +28,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -39,7 +48,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Api3(),
+      home: RangeSetApi(),
     );
   }
 }
@@ -174,6 +183,294 @@ class _Api3State extends State<Api3> {
                 return CircularProgressIndicator();
               })
         ],
+      ),
+    );
+  }
+}
+
+class Dogs extends StatefulWidget {
+  const Dogs({super.key});
+
+  @override
+  State<Dogs> createState() => _DogsState();
+}
+
+class _DogsState extends State<Dogs> {
+  Future<DogsA> fetchFromDogs() async {
+    var res =
+        await http.get(Uri.parse("https://dog.ceo/api/breeds/image/random"));
+    return DogsA.fromJson(jsonDecode(res.body));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          FutureBuilder(
+              future: fetchFromDogs(),
+              builder: (BuildContext context, snapshot) {
+                if (snapshot.hasData) {
+                  return Column(
+                    children: [
+                      Text(snapshot.data!.message.toString()),
+                      Text(snapshot.data!.status.toString()),
+                    ],
+                  );
+                }
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              })
+        ],
+      ),
+    );
+  }
+}
+
+class Ipify extends StatefulWidget {
+  const Ipify({super.key});
+
+  @override
+  State<Ipify> createState() => _IpifyState();
+}
+
+class _IpifyState extends State<Ipify> {
+  Future<Ipify1> fetchFromIpify() async {
+    var res = await http.get(Uri.parse("https://api.ipify.org/?format=json"));
+    return Ipify1.fromJson(jsonDecode(res.body));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          FutureBuilder(
+              future: fetchFromIpify(),
+              builder: (BuildContext context, snapshot) {
+                if (snapshot.hasData) {
+                  return Column(
+                    children: [Text(snapshot.data!.ip.toString())],
+                  );
+                }
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              })
+        ],
+      ),
+    );
+  }
+}
+
+class JokesA extends StatefulWidget {
+  const JokesA({super.key});
+
+  @override
+  State<JokesA> createState() => _JokesAState();
+}
+
+class _JokesAState extends State<JokesA> {
+  Future<Jokes> fetchFromJokes() async {
+    var res = await http
+        .get(Uri.parse("https://official-joke-api.appspot.com/random_joke"));
+    return Jokes.fromJson(jsonDecode(res.body));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        FutureBuilder(
+            future: fetchFromJokes(),
+            builder: (BuildContext context, snapshot) {
+              if (snapshot.hasData) {
+                return Column(
+                  children: [
+                    Text(snapshot.data!.id.toString()),
+                    Text(snapshot.data!.punchline.toString()),
+                    Text(snapshot.data!.setup.toString()),
+                    Text(snapshot.data!.type.toString())
+                  ],
+                );
+              }
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            })
+      ],
+    );
+  }
+}
+
+class CatsApi extends StatefulWidget {
+  const CatsApi({super.key});
+
+  @override
+  State<CatsApi> createState() => _CatsApiState();
+}
+
+class _CatsApiState extends State<CatsApi> {
+  Future<Facts> fetchFromCat() async {
+    var res = await http.get(Uri.parse("https://catfact.ninja/fact"));
+    return Facts.fromJson(jsonDecode(res.body));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          FutureBuilder(
+              future: fetchFromCat(),
+              builder: (BuildContext context, snapshot) {
+                if (snapshot.hasData) {
+                  return Column(
+                    children: [
+                      Text(snapshot.data!.fact.toString()),
+                      Text(snapshot.data!.length.toString())
+                    ],
+                  );
+                }
+                return CircularProgressIndicator();
+              })
+        ],
+      ),
+    );
+  }
+}
+
+class ApiList extends StatefulWidget {
+  const ApiList({super.key});
+
+  @override
+  State<ApiList> createState() => _ApiListState();
+}
+
+class _ApiListState extends State<ApiList> {
+  Future<List<ListApi>> fetch() async {
+    var res = await http.get(Uri.parse("https://fakestoreapi.com/products"));
+    var data = jsonDecode(res.body);
+    return (data as List).map((e) => ListApi.fromJson(e)).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Hi List'),
+      ),
+      body: FutureBuilder(
+        future: fetch(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasData) {
+            List<ListApi> list = snapshot.data!;
+            return Expanded(
+              child: ListView.builder(
+                itemCount: list.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  IdPass(id: list[index].id!)));
+                    },
+                    leading: Container(
+                      height: 70,
+                      width: 70,
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: NetworkImage(list[index].image!))),
+                    ),
+                    title: Column(
+                      children: [
+                        Text(list[index].id!.toString()),
+                        Text(list[index].title!.toString()),
+                        Text(list[index].description!.toString()),
+                        Text(list[index].category!.toString()),
+                        Text(list[index].rating!.rate.toString()),
+                        Text(list[index].rating!.count.toString()),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class IdPass extends StatefulWidget {
+  final int? id;
+  const IdPass({required this.id, super.key});
+
+  @override
+  State<IdPass> createState() => _IdPassState();
+}
+
+class _IdPassState extends State<IdPass> {
+  Future<Id> fetchFromId() async {
+    var res = await http
+        .get(Uri.parse("https://fakestoreapi.com/products/${widget.id}"));
+    print(widget.id);
+    return Id.fromJson(jsonDecode(res.body));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: FutureBuilder(
+        future: fetchFromId(),
+        builder: (BuildContext context, snapshot) {
+          if (snapshot.hasData) {
+            return Column(
+              children: [
+                Center(
+                  child: Container(
+                    height: 120,
+                    width: 120,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: NetworkImage(snapshot.data!.image!))),
+                  ),
+                ),
+                Text(snapshot.data!.id!.toString()),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(snapshot.data!.title!.toString()),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(snapshot.data!.description!.toString()),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(snapshot.data!.category!.toString()),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(snapshot.data!.rating!.rate.toString()),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(snapshot.data!.rating!.count.toString()),
+              ],
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
       ),
     );
   }
