@@ -89,6 +89,7 @@ class _DateRangeLimitState extends State<DateRangeLimit> {
                       return ListTile(
                         leading: Text(list[i].id.toString()),
                         title: Text(list[i].date.toString()),
+                       //trailing: Text(list[i].products![i].productId.toString()),
                       );
                     }));
           }
